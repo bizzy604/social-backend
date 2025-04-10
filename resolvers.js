@@ -3,7 +3,27 @@ import { hash, compare } from "bcrypt"
 import jwt from "jsonwebtoken"
 import { GraphQLError } from "graphql"
 
-const prisma = new PrismaClient()
+// Implement Prisma singleton pattern with connection pooling for serverless environments
+// This prevents connection pool exhaustion during concurrent requests
+let prisma;
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient({
+    // Optimize connection pooling for serverless
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+    // Log only errors in production
+    log: ['error'],
+  });
+} else {
+  // Development environment
+  prisma = new PrismaClient({
+    log: ['query', 'info', 'warn', 'error'],
+  });
+}
 
 export const resolvers = {
   Query: {

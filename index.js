@@ -1,6 +1,7 @@
 import { ApolloServer } from "@apollo/server"
 import { expressMiddleware } from "@apollo/server/express4"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled'
 import express from "express"
 import http from "http"
 import cors from "cors"
@@ -15,19 +16,25 @@ dotenv.config()
 // Determine if we're in a serverless environment (Vercel)
 const isServerless = process.env.VERCEL === '1'
 
+// The PrismaClient is handled in resolvers.js to allow for connection pooling
+// This avoids repeated cold starts in serverless environments
+
 // Function to set up and start the server
 async function startServer() {
   // Create Express app and HTTP server
   const app = express()
   const httpServer = http.createServer(app)
   
-  // Create Apollo Server
+  // Create Apollo Server with optimized configuration for serverless
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    // Skip the drain plugin in serverless environment to avoid timeouts
-    plugins: isServerless ? [] : [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: true, // Enable introspection for GraphQL Playground
+    // Use minimal plugins in serverless environment to reduce cold start time
+    plugins: isServerless 
+      ? [ApolloServerPluginLandingPageDisabled()]
+      : [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: process.env.NODE_ENV !== 'production', // Disable introspection in production for security
+    cache: 'bounded', // Use bounded in-memory cache for better performance
   })
   
   // Start the server

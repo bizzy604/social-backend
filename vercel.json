@@ -25,7 +25,7 @@
     "VERCEL": "1"
   },
   "functions": {
-    "index.js": {
+    "api/graphql.js": {
       "memory": 1024,
       "maxDuration": 30
     }
