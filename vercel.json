@@ -21,7 +21,13 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VERCEL": "1"
   },
-  "outputDirectory": "."
+  "functions": {
+    "index.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
