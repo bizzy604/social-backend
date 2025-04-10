@@ -9,15 +9,15 @@
   "routes": [
     {
       "src": "/graphql",
-      "dest": "index.js"
+      "dest": "/api/graphql.js"
     },
     {
       "src": "/health",
-      "dest": "index.js"
+      "dest": "/api/health.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "index.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     }
   ],
   "env": {
@@ -27,7 +27,7 @@
   "functions": {
     "api/graphql.js": {
       "memory": 1024,
-      "maxDuration": 30
+      "maxDuration": 60
     }
   }
 }
